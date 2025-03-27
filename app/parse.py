@@ -1,7 +1,7 @@
 import csv
 from dataclasses import dataclass, fields, astuple
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 
 @dataclass
@@ -15,7 +15,7 @@ URL = "https://quotes.toscrape.com/"
 PAGE = "page/{page}/"
 
 
-def parse_quote(quote: [str]) -> Quote:
+def parse_quote(quote: Tag) -> Quote:
     return Quote(
         text=quote.select_one(".text").text,
         author=quote.select_one(".author").text,
@@ -23,7 +23,7 @@ def parse_quote(quote: [str]) -> Quote:
     )
 
 
-def get_quotes() -> [Quote]:
+def get_quotes() -> list[Quote]:
     next_page = 1
     quotes = []
     while next_page:
@@ -37,7 +37,7 @@ def get_quotes() -> [Quote]:
     return [parse_quote(quote) for quote in quotes]
 
 
-def write_to_csv(filename: str, quotes: [Quote]) -> None:
+def write_to_csv(filename: str, quotes: list[Quote]) -> None:
     with open(filename, "w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
         writer.writerow([field.name for field in fields(Quote)])
